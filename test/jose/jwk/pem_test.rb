@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class JOSE::JWK::PEMTest < Minitest::Test
-
   def test_from_pem_and_to_pem
     ec_pem_data = \
       "-----BEGIN EC PRIVATE KEY-----\n" \
@@ -17,6 +16,7 @@ class JOSE::JWK::PEMTest < Minitest::Test
     encrypted_ec_pem_data = JOSE::JWK.to_pem(ec_pem, ec_pem_password)
     refute_equal ec_pem_data, encrypted_ec_pem_data
     assert_equal ec_pem, JOSE::JWK.from_pem(encrypted_ec_pem_data, ec_pem_password)
+
     rsa_pem_data = \
       "-----BEGIN RSA PRIVATE KEY-----\n" \
       "MIIEpAIBAAKCAQEAxnAUUvtW3ftv25jCB+hePVCnhROqH2PACVGoCybdtMYTl8qV\n" \
@@ -53,6 +53,32 @@ class JOSE::JWK::PEMTest < Minitest::Test
     encrypted_rsa_pem_data = JOSE::JWK.to_pem(rsa_pem, rsa_pem_password)
     refute_equal rsa_pem_data, encrypted_rsa_pem_data
     assert_equal rsa_pem, JOSE::JWK.from_pem(encrypted_rsa_pem_data, rsa_pem_password)
-  end
 
+    x509_pem_data = \
+      "-----BEGIN CERTIFICATE-----\n" \
+      "MIIDXTCCAkWgAwIBAgIJALnK/Zw01LzPMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV\n" \
+      "BAYTAlVTMRAwDgYDVQQIDAdNYXJ5bGFuZDEPMA0GA1UEBwwGQmV0aGVzMRQwEgYD\n" \
+      "VQQKDAtNeSBDb21wYW55IEx0ZDAeFw0xOTA2MjQxOTM4MjZaFw0yOTA2MjExOTM4\n" \
+      "MjZaMEUxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdNYXJ5bGFuZDEPMA0GA1UEBwwG\n" \
+      "QmV0aGVzMRQwEgYDVQQKDAtNeSBDb21wYW55IEx0ZDCCASIwDQYJKoZIhvcNAQEB\n" \
+      "BQADggEPADCCAQoCggEBALnlHX/OAD3Z6iShpQmYebJfi5+AMYOhePPoWbE5T3c5\n" \
+      "2e+BB1P1ZG3H0xRzKHr/O3zme6iFzbbm2peSGieAY3dZYZgEU1Irwaf74WZ1zUhu\n" \
+      "l3bjlC2azqDDC/n9u5NZ3mZ2/XbYDwU2jqqmeZDPdCMehwG36H5HkBlRNHlx6bK8\n" \
+      "QWkQ6E9s4d5QgtF4cKJjyk4r1u9f2FE/oA2FptDZ0F1v3UOZnnAnXfrdqgMAx4w2\n" \
+      "vZkmNp7BG8e5Tsa4GF4YFbAQ+9mcXsBrHHtVpOYs80bDt4X8JzD5ZhBe0B9M00gR\n" \
+      "wIZPHQlB9s8b5uCeAQklEgRJKt5DZgGg6FkjH8ZG7sTbEECAwEAAaNTMFEwHQYD\n" \
+      "VR0OBBYEFMvdMOpE+E13jc5B5nH7W0rAVwQtMB8GA1UdIwQYMBaAFMvdMOpE+E13\n" \
+      "jc5B5nH7W0rAVwQtMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB\n" \
+      "AAh34gP8UeRVUDFc2J9/7G4SHXjX7YBboEl7PZhsuwuSC8DfAzGGDFxuIkKpL6ik\n" \
+      "R7o/tHHtdhHi9Uy6WcHKug9Y0by7ADzZbP07m3v4oSGWAKS+CXUVTHt7yXJblsVu\n" \
+      "6CmlPlmx9CG9hQfpO0JYa+v1gL5AMmbsbvby4GnVCg5McRZr1h6U4J83QLUVkSD3\n" \
+      "cQXQGdRHRwPNrK4aFcwhGcYrV0fUw0Rgubz1bkCEdiq3e5XH7mgdd7YUZpCbh6p4\n" \
+      "Rz2eTP4PBhMiZoERazCKK/evGmtM4n5BcdJkpGiMkPf2ke1Dr8cx/7OVGJROtG0e\n" \
+      "W50qVg4iVjtjRuC2t8hXTDVb9BI=\n" \
+      "-----END CERTIFICATE-----\n"
+
+    x509_key = OpenSSL::X509::Certificate.new(x509_pem_data).public_key
+    x509_jwk = JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(x509_key))
+    assert_equal x509_key, x509_jwk.key.__getobj__
+  end
 end

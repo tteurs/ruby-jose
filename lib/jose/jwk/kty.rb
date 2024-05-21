@@ -2,11 +2,14 @@ module JOSE::JWK::KTY
 
   def self.from_key(object)
     object = object.__getobj__ if object.is_a?(JOSE::JWK::PKeyProxy)
+
     case object
+    when OpenSSL::X509::Certificate
+      JOSE::JWK::KTY_X509.from_key(object)
     when OpenSSL::PKey::EC
-      return JOSE::JWK::KTY_EC.from_key(object)
+      JOSE::JWK::KTY_EC.from_key(object)
     when OpenSSL::PKey::RSA
-      return JOSE::JWK::KTY_RSA.from_key(object)
+      JOSE::JWK::KTY_RSA.from_key(object)
     else
       raise ArgumentError, "'object' is not a recognized key type: #{object.class.name}"
     end
@@ -38,4 +41,5 @@ require 'jose/jwk/kty_okp_ed448'
 require 'jose/jwk/kty_okp_ed448ph'
 require 'jose/jwk/kty_okp_x25519'
 require 'jose/jwk/kty_okp_x448'
+require 'jose/jwk/kty_x509'
 require 'jose/jwk/kty_rsa'
