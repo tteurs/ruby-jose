@@ -3,6 +3,8 @@ class JOSE::JWK::KTY_X509 < Struct.new(:key)
   def self.from_key(object)
     object = object.__getobj__ if object.is_a?(JOSE::JWK::PKeyProxy)
     case object
+    when OpenSSL::PKey::PKey
+      JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(object))
     when OpenSSL::X509::Certificate
       JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(object.public_key))
     else

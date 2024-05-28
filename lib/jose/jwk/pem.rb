@@ -25,6 +25,8 @@ module JOSE::JWK::PEM
       end
     elsif key.is_a?(OpenSSL::X509::Certificate)
       return key.to_pem
+    elsif key.is_a?(JOSE::JWK::PKeyProxy)
+      return key.__getobj__.to_pem
     else
       raise ArgumentError, "Unsupported key type: #{key.class}"
     end
