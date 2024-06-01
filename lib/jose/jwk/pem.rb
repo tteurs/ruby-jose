@@ -16,7 +16,7 @@ module JOSE::JWK::PEM
   end
 
   def to_binary(key, password = nil)
-    if key.is_a?(OpenSSL::PKey::PKey)
+    if key.is_a?(JOSE::JWK::PKeyProxy)
       if password
         cipher = OpenSSL::Cipher.new('DES-EDE3-CBC')
         return key.to_pem(cipher, password)
