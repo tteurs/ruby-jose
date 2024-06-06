@@ -58,8 +58,12 @@ class JOSE::JWK::PEMTest < Minitest::Test
     assert_equal rsa_pem, JOSE::JWK.from_pem(encrypted_rsa_pem_data, rsa_pem_password)
   end
 
+  def sanitize_pem(pem)
+    pem.gsub(/\s+/, '').gsub(/\n/, '')
+  end
+
   def test_from_pem_and_to_pem_x509
-    x509_pem_data = <<~PEM.strip
+    x509_pem_data = <<~PEM
       -----BEGIN CERTIFICATE-----
       MIIDxzCCAq+gAwIBAgIUXm1i9UarQZwGQ3MaNarRSUZbwVAwDQYJKoZIhvcNAQEL
       BQAwczELMAkGA1UEBhMCQlIxCzAJBgNVBAgMAlJTMQwwCgYDVQQHDANQT0ExDTAL
@@ -89,8 +93,7 @@ class JOSE::JWK::PEMTest < Minitest::Test
     x509_key = x509_cert.public_key
     x509_jwk = JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(x509_key))
 
-    binary_data = x509_pem_data.unpack1('m0')
-    from_binary_jwk = JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(OpenSSL::X509::Certificate.new(binary_data).public_key))
+    from_binary_jwk = JOSE::JWK::KTY_X509.new(JOSE::JWK::PKeyProxy.new(OpenSSL::X509::Certificate.new(x509_pem_data).public_key))
 
     assert_equal x509_jwk.key.__getobj__.to_pem.strip, from_binary_jwk.key.__getobj__.to_pem.strip
   end
